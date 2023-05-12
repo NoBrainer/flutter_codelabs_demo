@@ -1,5 +1,5 @@
 name: flutter_codelabs_demo
-description: A new Flutter project.
+description: "A new Flutter project based on this tutorial: https://codelabs.developers.google.com/codelabs/flutter-codelab-first"
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
