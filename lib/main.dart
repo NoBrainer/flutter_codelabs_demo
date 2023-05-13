@@ -36,12 +36,16 @@ class MyAppState extends ChangeNotifier {
 
   var favorites = <WordPair>[];
 
-  void toggleFavorite() {
+  void toggleCurrentFavorite() {
+    toggleFavorite(current);
+  }
+
+  void toggleFavorite(favorite) {
     if (isFavorite()) {
-      favorites.remove(current);
+      favorites.remove(favorite);
       print('favorite removed!');
     } else {
-      favorites.add(current);
+      favorites.add(favorite);
       print('favorite added!');
     }
     notifyListeners();
@@ -63,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = GeneratorPage();
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -132,7 +136,7 @@ class GeneratorPage extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  appState.toggleFavorite();
+                  appState.toggleCurrentFavorite();
                 },
                 icon: Icon(icon),
                 label: Text('Like'),
@@ -178,6 +182,34 @@ class BigCard extends StatelessWidget {
           style: style,
         ),
       )
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var favorites = appState.favorites;
+    var count = favorites.length;
+
+    if (favorites.isEmpty) {
+      return Center(child: Text('No favorites yet'));
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have $count favorites:'),
+        ),
+        ...favorites.map((f) =>
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(f.asLowerCase, semanticsLabel: "${f.first} ${f.second}"),
+          ),
+        ).toList(),
+      ],
     );
   }
 }
