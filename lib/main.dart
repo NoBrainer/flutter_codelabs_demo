@@ -28,20 +28,19 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var current = WordPair.random();
+  var favorites = <WordPair>[];
 
   void getNext() {
     current = WordPair.random();
     notifyListeners();
   }
 
-  var favorites = <WordPair>[];
-
   void toggleCurrentFavorite() {
     toggleFavorite(current);
   }
 
   void toggleFavorite(favorite) {
-    if (isFavorite()) {
+    if (isFavorite(favorite)) {
       favorites.remove(favorite);
       print('favorite removed!');
     } else {
@@ -51,8 +50,12 @@ class MyAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isFavorite() {
-    return favorites.contains(current);
+  bool isCurrentFavorite() {
+    return isFavorite(current);
+  }
+
+  bool isFavorite(favorite) {
+    return favorites.contains(favorite);
   }
 }
 
@@ -123,7 +126,8 @@ class GeneratorPage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
-    IconData icon = appState.isFavorite() ? Icons.favorite : Icons.favorite_border;
+    IconData icon = appState.isCurrentFavorite() ? Icons.favorite
+        : Icons.favorite_border;
 
     return Center(
       child: Column(
@@ -193,22 +197,23 @@ class FavoritesPage extends StatelessWidget {
     var favorites = appState.favorites;
     var count = favorites.length;
 
-    if (favorites.isEmpty) {
-      return Center(child: Text('No favorites yet'));
-    }
+    var message = favorites.isEmpty ? 'No favorites yet'
+        : 'You have $count favorite${count == 1 ? '' : 's'}:';
+
+    var widgetList = favorites.map((f) =>
+        ListTile(
+          leading: Icon(Icons.favorite),
+          title: Text(f.asLowerCase, semanticsLabel: "${f.first} ${f.second}"),
+        ),
+    ).toList();
 
     return ListView(
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
-          child: Text('You have $count favorites:'),
+          child: Text(message),
         ),
-        ...favorites.map((f) =>
-          ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(f.asLowerCase, semanticsLabel: "${f.first} ${f.second}"),
-          ),
-        ).toList(),
+        ...widgetList,
       ],
     );
   }
